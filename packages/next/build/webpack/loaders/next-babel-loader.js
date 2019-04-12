@@ -20,6 +20,14 @@ module.exports = babelLoader.custom(babel => {
       }
       const filename = join(opts.cwd, 'noop.js')
       const loader = Object.assign({
+        root: opts.cwd,
+        generatorOpts: {
+          retainLines: true,
+          compact: true,
+          minified: true,
+          comments: false,
+          shouldPrintComment: comment => /^\s*?#__PURE__\s*?$/.test(comment)
+        },
         cacheCompression: false,
         cacheDirectory: true,
         cacheIdentifier: cacheKey + JSON.stringify(
