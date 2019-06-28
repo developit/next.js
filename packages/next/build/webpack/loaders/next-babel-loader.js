@@ -152,14 +152,12 @@ module.exports = babelLoader.custom(babel => {
         }
       ]
 
-      if (process.env.GENERATOR_OPTS === 'true') {
-        options.generatorOpts = {
-          retainLines: true,
-          compact: true,
-          minified: true,
-          comments: false,
-          shouldPrintComment: comment => /^\s*?#__PURE__\s*?$/.test(comment)
-        }
+      options.generatorOpts = {
+        retainLines: true,
+        compact: true,
+        minified: true,
+        comments: false,
+        shouldPrintComment: comment => /^\s*?#__PURE__\s*?$/.test(comment)
       }
 
       return options
