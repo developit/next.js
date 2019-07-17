@@ -2,32 +2,10 @@ const notifier = require('node-notifier')
 const relative = require('path').relative
 
 const babelClientOpts = {
-  presets: [
-    '@babel/preset-typescript',
-    [
-      '@babel/preset-env',
-      {
-        modules: 'commonjs',
-        targets: {
-          esmodules: true
-        },
-        loose: true,
-        exclude: ['transform-typeof-symbol']
-      }
-    ],
-    '@babel/preset-react'
-  ],
+  presets: ['@babel/preset-typescript', '@babel/preset-react'],
   plugins: [
-    ['@babel/plugin-proposal-class-properties', { loose: true }],
-    [
-      '@babel/plugin-transform-runtime',
-      {
-        corejs: 2,
-        helpers: true,
-        regenerator: false,
-        useESModules: false
-      }
-    ]
+    ['@babel/plugin-transform-modules-commonjs', { loose: true }],
+    ['@babel/plugin-proposal-class-properties', { loose: true }]
   ]
 }
 

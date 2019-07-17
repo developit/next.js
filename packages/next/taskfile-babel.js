@@ -9,10 +9,14 @@ module.exports = function (task) {
   task.plugin('babel', {}, function * (file, babelOpts, { stripExtension } = {}) {
     const options = {
       ...babelOpts,
-      compact: true,
       babelrc: false,
       configFile: false,
-      filename: file.base
+      filename: file.base,
+      generatorOpts: {
+        compact: true,
+        minified: true,
+        shouldPrintComment: val => /@license|@preserve/.test(val)
+      }
     }
     const output = transform(file.data, options)
     const ext = extname(file.base)
