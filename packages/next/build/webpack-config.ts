@@ -141,6 +141,10 @@ export default async function getBaseWebpackConfig(
       next: NEXT_PROJECT_ROOT,
       [PAGES_DIR_ALIAS]: path.join(dir, 'pages'),
       [DOT_NEXT_ALIAS]: distDir,
+      'object-assign': 'next/dist/build/polyfills/object-assign.js',
+      'whatwg-fetch': 'next/dist/build/polyfills/fetch.js',
+      unfetch: 'next/dist/build/polyfills/fetch.js',
+      'isomorphic-unfetch': 'next/dist/build/polyfills/fetch.js',
     },
     mainFields: isServer ? ['main', 'module'] : ['browser', 'module', 'main'],
   }
@@ -306,6 +310,13 @@ export default async function getBaseWebpackConfig(
                       chunks: 'all',
                       test: /[\\/]node_modules[\\/](react|react-dom)[\\/]/,
                     },
+                    polyfills: {
+                      name: 'polyfills',
+                      chunks: 'all',
+                      reuseExistingChunk: false,
+                      priority: 100,
+                      test: /[\\/]node_modules[\\/](core-js|corejs|babel-runtime|@babel[\\/]runtime(-corejs2?)?)[\\/]/,
+                    },
                   },
                 },
             minimize: !dev,
@@ -428,6 +439,58 @@ export default async function getBaseWebpackConfig(
       ].filter(Boolean),
     },
     plugins: [
+      new (class PolyfillReplacerPlugin {
+        mappings: { [source: string]: string } = {
+          // stdlib
+          'object-assign': 'Object.assign',
+          'object-is': 'Object.is',
+
+          // Fetch
+          'whatwg-fetch': 'fetch',
+          'isomorphic-fetch': 'fetch',
+          'isomorphic-unfetch': 'fetch',
+          'unfetch/polyfill': 'fetch',
+          unfetch: 'fetch',
+          // Promise
+          'es6-promise': 'Promise',
+          'promise-polyfill': 'Promise',
+          lie: 'Promise',
+        }
+
+        apply(compiler: webpack.Compiler) {
+          const ParserHelpers = require('webpack/lib/ParserHelpers')
+          const NAME = 'PolyfillReplacer'
+          const hook = (parser: any, statement: any, source: string) => {
+            if (this.mappings.hasOwnProperty(source)) {
+              const mapped = this.mappings[source]
+              return ParserHelpers.toConstantDependency(parser, mapped)(
+                statement
+              )
+            }
+          }
+          compiler.hooks.normalModuleFactory.tap(NAME, factory => {
+            for (const type of ['auto', 'esm', 'dynamic']) {
+              factory.hooks.parser
+                .for('javascript/' + type)
+                .tap(NAME, parser => {
+                  parser.hooks.import.tap(
+                    NAME,
+                    (statement: any, source: string) => {
+                      return hook(parser, statement, source)
+                    }
+                  )
+                  parser.hooks.call.for('require').tap(NAME, (expr: any) => {
+                    const statement = expr
+                    const source = parser.evaluateExpression(expr.arguments[0])
+                      .string as string
+                    return hook(parser, statement, source)
+                  })
+                })
+            }
+          })
+        }
+      })(),
+
       // This plugin makes sure `output.filename` is used for entry chunks
       new ChunkNamesPlugin(),
       new webpack.DefinePlugin({
