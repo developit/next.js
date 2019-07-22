@@ -148,8 +148,7 @@ module.exports = babelLoader.custom(babel => {
         {
           test: [
             /next-server[\\/]dist[\\/]lib/,
-            /next[\\/]dist[\\/]client/,
-            /next[\\/]dist[\\/]pages/
+            /next[\\/]dist[\\/](client|pages|build)[\\/]/
           ],
           plugins: [commonJsItem]
         }

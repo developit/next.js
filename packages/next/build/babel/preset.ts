@@ -7,7 +7,7 @@ const isTest = env === 'test'
 type StyledJsxPlugin = [string, any] | string
 type StyledJsxBabelOptions =
   | {
-      plugins?: StyledJsxPlugin[],
+      plugins?: StyledJsxPlugin[]
       'babel-test'?: boolean
     }
   | undefined
@@ -64,7 +64,10 @@ module.exports = (
     // In the test environment `modules` is often needed to be set to true, babel figures that out by itself using the `'auto'` option
     // In production/development this option is set to `false` so that webpack can handle import/export with tree-shaking
     modules: 'auto',
-    exclude: ['transform-typeof-symbol'],
+    exclude: ['transform-typeof-symbol', '@babel/plugin-transform-regenerator'],
+    loose: isProduction,
+    useBuiltIns: 'usage',
+    corejs: 2,
     ...options['preset-env'],
   }
   return {
@@ -96,16 +99,11 @@ module.exports = (
         },
       ],
       [
-        require('@babel/plugin-transform-runtime'),
-        {
-          corejs: 2,
-          helpers: true,
-          regenerator: true,
-          useESModules: supportsESM && presetEnvConfig.modules !== 'commonjs',
-          ...options['transform-runtime'],
-        },
+        isTest && options['styled-jsx'] && options['styled-jsx']['babel-test']
+          ? require('styled-jsx/babel-test')
+          : require('styled-jsx/babel'),
+        styledJsxOptions(options['styled-jsx']),
       ],
-      [(isTest && options['styled-jsx'] && options['styled-jsx']['babel-test']) ? require('styled-jsx/babel-test') : require('styled-jsx/babel'), styledJsxOptions(options['styled-jsx'])],
       require('./plugins/amp-attributes'),
       isProduction && [
         require('babel-plugin-transform-react-remove-prop-types'),
