@@ -217,6 +217,18 @@ export default async function getBaseWebpackConfig(
     mode: webpackMode,
     name: isServer ? 'server' : 'client',
     target: isServer ? 'node' : 'web',
+    node: isServer
+      ? undefined
+      : {
+          console: false,
+          global: true,
+          process: false,
+          __filename: 'mock',
+          __dirname: 'mock',
+          Buffer: false,
+          setImmediate: false,
+        },
+
     externals: !isServer
       ? undefined
       : target !== 'serverless'
