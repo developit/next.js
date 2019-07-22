@@ -56,11 +56,15 @@ export default async function getBaseWebpackConfig(
   }
 ): Promise<webpack.Configuration> {
   const distDir = path.join(dir, config.distDir)
+
+  const isModern = !!config.experimental.modern
+
   const defaultLoaders = {
     babel: {
       loader: 'next-babel-loader',
       options: {
         isServer,
+        isModern,
         distDir,
         cwd: dir,
         cache: !selectivePageBuilding,
@@ -194,7 +198,7 @@ export default async function getBaseWebpackConfig(
       ecma: 8,
     },
     compress: {
-      ecma: 5,
+      ecma: isModern ? 8 : 5,
       warnings: false,
       // The following two options are known to break valid JavaScript code
       comparisons: false,
@@ -202,7 +206,7 @@ export default async function getBaseWebpackConfig(
     },
     mangle: { safari10: true },
     output: {
-      ecma: 5,
+      ecma: isModern ? 8 : 5,
       safari10: true,
       comments: false,
       // Fixes usage of Emoji and certain Regex

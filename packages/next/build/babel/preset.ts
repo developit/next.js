@@ -57,8 +57,7 @@ function supportsStaticESM(caller: any) {
 
 // Enable when module/nomodule ships.
 function isModernBuild(caller: any) {
-  // return !!(caller && caller.isModern);
-  return true
+  return !!(caller && caller.isModern)
 }
 
 module.exports = (

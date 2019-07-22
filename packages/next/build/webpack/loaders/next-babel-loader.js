@@ -24,6 +24,7 @@ module.exports = babelLoader.custom(babel => {
     customOptions (opts) {
       const custom = {
         isServer: opts.isServer,
+        isModern: opts.isModern,
         asyncToPromises: opts.asyncToPromises
       }
       const filename = join(opts.cwd, 'noop.js')
@@ -49,6 +50,7 @@ module.exports = babelLoader.custom(babel => {
       )
 
       delete loader.isServer
+      delete loader.isModern
       delete loader.asyncToPromises
       delete loader.cache
       delete loader.distDir
@@ -58,7 +60,7 @@ module.exports = babelLoader.custom(babel => {
       cfg,
       {
         source,
-        customOptions: { isServer, asyncToPromises }
+        customOptions: { isServer, isModern, asyncToPromises }
       }
     ) {
       const { cwd } = cfg.options
@@ -79,6 +81,8 @@ module.exports = babelLoader.custom(babel => {
         // Add our default preset if the no "babelrc" found.
         options.presets = [...options.presets, presetItem]
       }
+
+      options.caller.isModern = isModern
 
       if (!isServer && isPageFile) {
         const pageConfigPlugin = babel.createConfigItem(
