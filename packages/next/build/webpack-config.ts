@@ -336,7 +336,7 @@ export default async function getBaseWebpackConfig(
                     react: {
                       name: 'commons',
                       chunks: 'all',
-                      test: /[\\/]node_modules[\\/](react|react-dom)[\\/]/,
+                      test: /[\\/]node_modules[\\/](react|react-dom|scheduler)[\\/]/,
                     },
                   },
                 }
@@ -353,7 +353,7 @@ export default async function getBaseWebpackConfig(
                     react: {
                       name: 'commons',
                       chunks: 'all',
-                      test: /[\\/]node_modules[\\/](react|react-dom)[\\/]/,
+                      test: /[\\/]node_modules[\\/](react|react-dom|scheduler|prop-types)[\\/]/,
                     },
                     // Float widely used next client-side libraries (router, page loader) into the runtime chunk
                     // This ensures the runtime chunk contains the most common libs, which prevents it from being
