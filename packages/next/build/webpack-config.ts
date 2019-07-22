@@ -535,8 +535,6 @@ export default async function getBaseWebpackConfig(
           : {
               // Allow server-only code to be eliminated
               'typeof window': JSON.stringify('object'),
-
-              process: '{}',
             }),
       }),
       !isServer &&
