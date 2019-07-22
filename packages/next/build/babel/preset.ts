@@ -55,11 +55,19 @@ function supportsStaticESM(caller: any) {
   return !!(caller && caller.supportsStaticESM)
 }
 
+// Enable when module/nomodule ships.
+function isModernBuild(caller: any) {
+  // return !!(caller && caller.isModern);
+  return true
+}
+
 module.exports = (
   api: any,
   options: NextBabelPresetOptions = {}
 ): BabelPreset => {
   const supportsESM = api.caller(supportsStaticESM)
+  const isModern = api.caller(isModernBuild)
+
   const presetEnvConfig = {
     // In the test environment `modules` is often needed to be set to true, babel figures that out by itself using the `'auto'` option
     // In production/development this option is set to `false` so that webpack can handle import/export with tree-shaking
@@ -70,32 +78,44 @@ module.exports = (
     corejs: 2,
     ...options['preset-env'],
   }
+
   return {
     presets: [
-      [require('@babel/preset-env').default, presetEnvConfig],
+      isModern
+        ? require('babel-preset-modules')
+        : [require('@babel/preset-env').default, presetEnvConfig],
       [
         require('@babel/preset-react'),
         {
           // This adds @babel/plugin-transform-react-jsx-source and
           // @babel/plugin-transform-react-jsx-self automatically in development
           development: isDevelopment || isTest,
+          useBuiltIns: isModern,
           ...options['preset-react'],
         },
       ],
       require('@babel/preset-typescript'),
     ],
     plugins: [
+      !supportsESM && [
+        require('@babel/plugin-transform-modules-commonjs'),
+        { loose: true },
+      ],
       require('babel-plugin-react-require'),
       require('@babel/plugin-syntax-dynamic-import'),
       require('./plugins/react-loadable-plugin'),
       [
         require('@babel/plugin-proposal-class-properties'),
-        options['class-properties'] || {},
+        {
+          loose: true,
+          ...(options['class-properties'] || {}),
+        },
       ],
       [
         require('@babel/plugin-proposal-object-rest-spread'),
         {
-          useBuiltIns: true,
+          loose: true,
+          useBuiltIns: isModern,
         },
       ],
       [
