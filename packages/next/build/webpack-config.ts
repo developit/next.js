@@ -139,6 +139,43 @@ export default async function getBaseWebpackConfig(
       next: NEXT_PROJECT_ROOT,
       [PAGES_DIR_ALIAS]: path.join(dir, 'pages'),
       [DOT_NEXT_ALIAS]: distDir,
+      'whatwg-fetch': 'next/dist/build/polyfills/fetch.js',
+      unfetch: 'next/dist/build/polyfills/fetch.js',
+      'isomorphic-unfetch': 'next/dist/build/polyfills/fetch.js',
+
+      'object-assign': 'next/dist/build/polyfills/object-assign.cjs.js',
+      '@babel/runtime-corejs2/core-js/map': 'next/dist/build/polyfills/map.js',
+      '@babel/runtime-corejs2/core-js/set': 'next/dist/build/polyfills/set.js',
+      '@babel/runtime-corejs2/core-js/object/assign':
+        'next/dist/build/polyfills/object-assign.js',
+      '@babel/runtime-corejs2/core-js/object/define-property':
+        'next/dist/build/polyfills/object-define-property.js',
+      'core-js/library/fn/object/define-property':
+        'next/dist/build/polyfills/object-define-property.js',
+      '@babel/runtime-corejs2/core-js/object/get-own-property-descriptor':
+        'next/dist/build/polyfills/object-get-own-property-descriptor.js',
+      'core-js/library/fn/object/get-own-property-descriptor':
+        'next/dist/build/polyfills/object-get-own-property-descriptor.js',
+      '@babel/runtime-corejs2/core-js/promise':
+        'next/dist/build/polyfills/promise.js',
+
+      'core-js/library/modules/_global':
+        'next/dist/build/polyfills/globalThis.js',
+      '@babel/runtime-corejs2/core-js/json/stringify':
+        'next/dist/build/polyfills/json-stringify.js',
+      '@babel/runtime-corejs2/core-js/date/now':
+        'next/dist/build/polyfills/date-now.js',
+      '@babel/runtime-corejs2/core-js/array/is-array':
+        'next/dist/build/polyfills/is-array.js',
+
+      ...(isServer
+        ? {}
+        : {
+            // on the client, polyfill Node `url` and `querystring` using URL:
+            url: 'next/dist/build/polyfills/url.js',
+            querystring: 'qss',
+            'querystring-es3': 'qss',
+          }),
     },
     mainFields: isServer ? ['main', 'module'] : ['browser', 'module', 'main'],
   }
@@ -305,6 +342,16 @@ export default async function getBaseWebpackConfig(
                       name: 'commons',
                       chunks: 'all',
                       test: /[\\/]node_modules[\\/](react|react-dom)[\\/]/,
+                    },
+                    // Float widely used next client-side libraries (router, page loader) into the runtime chunk
+                    // This ensures the runtime chunk contains the most common libs, which prevents it from being
+                    // inefficiently small. We don't want any universally required chunks to be <10kb.
+                    next: {
+                      name: 'commons',
+                      chunks: 'all',
+                      test: /[\\/]next-server[\\/]dist[\\/]|[\\/]next[\\/]dist[\\/](client|build)[\\/]|[\\/]node_modules[\\/](styled-jsx|qss)[\\/]/,
+                      priority: 100,
+                      minChunks: 2,
                     },
                   },
                 },

@@ -101,7 +101,8 @@
     "webpack-dev-middleware": "3.7.0",
     "webpack-hot-middleware": "2.25.0",
     "webpack-sources": "1.3.0",
-    "worker-farm": "1.7.0"
+    "worker-farm": "1.7.0",
+    "qss": "^2.0.3"
   },
   "peerDependencies": {
     "react": "^16.6.0",
