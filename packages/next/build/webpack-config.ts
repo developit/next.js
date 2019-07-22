@@ -177,7 +177,7 @@ export default async function getBaseWebpackConfig(
             'querystring-es3': 'qss',
           }),
     },
-    mainFields: isServer ? ['main', 'module'] : ['browser', 'module', 'main'],
+    mainFields: isServer ? ['main', 'module'] : ['module', 'browser', 'main'],
   }
 
   const webpackMode = dev ? 'development' : 'production'
