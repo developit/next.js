@@ -514,6 +514,11 @@ export default async function getBaseWebpackConfig(
         'process.env.__NEXT_EXPORT_TRAILING_SLASH': JSON.stringify(
           config.exportTrailingSlash
         ),
+        ...(dev
+          ? {}
+          : {
+              'module.hot': 'undefined',
+            }),
         ...(isServer
           ? {
               // Allow browser-only code to be eliminated
@@ -526,6 +531,8 @@ export default async function getBaseWebpackConfig(
           : {
               // Allow server-only code to be eliminated
               'typeof window': JSON.stringify('object'),
+
+              process: '{}',
             }),
       }),
       !isServer &&
