@@ -3,31 +3,19 @@ const relative = require('path').relative
 
 const babelClientOpts = {
   presets: [
+    'babel-preset-modules',
     '@babel/preset-typescript',
     [
-      '@babel/preset-env',
+      '@babel/preset-react',
       {
-        modules: 'commonjs',
-        targets: {
-          esmodules: true
-        },
-        loose: true,
-        exclude: ['transform-typeof-symbol']
-      }
-    ],
-    '@babel/preset-react'
-  ],
-  plugins: [
-    ['@babel/plugin-proposal-class-properties', { loose: true }],
-    [
-      '@babel/plugin-transform-runtime',
-      {
-        corejs: 2,
-        helpers: true,
-        regenerator: false,
-        useESModules: false
+        useBuiltIns: true,
+        loose: true
       }
     ]
+  ],
+  plugins: [
+    ['@babel/plugin-transform-modules-commonjs', { loose: true }],
+    ['@babel/plugin-proposal-class-properties', { loose: true }]
   ]
 }
 
