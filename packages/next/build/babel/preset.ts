@@ -78,9 +78,17 @@ module.exports = (
     ...options['preset-env'],
   }
 
+  const usePresetEnvModern =
+    isModern && process.env.USE_PRESET_ENV && !process.env.USE_PRESET_ENV_STOCK
+  if (usePresetEnvModern) {
+    presetEnvConfig.targets = {
+      esmodules: true,
+    }
+  }
+
   return {
     presets: [
-      isModern
+      isModern && !process.env.USE_PRESET_ENV
         ? require('babel-preset-modules')
         : [require('@babel/preset-env').default, presetEnvConfig],
       [
@@ -96,6 +104,16 @@ module.exports = (
       require('@babel/preset-typescript'),
     ],
     plugins: [
+      // usePresetEnvModern && [
+      //   require('@babel/plugin-transform-runtime'),
+      //   {
+      //     corejs: 2,
+      //     helpers: true,
+      //     regenerator: true,
+      //     useESModules: supportsESM && presetEnvConfig.modules !== 'commonjs',
+      //     ...options['transform-runtime'],
+      //   }
+      // ],
       !supportsESM && [
         require('@babel/plugin-transform-modules-commonjs'),
         { loose: true },
