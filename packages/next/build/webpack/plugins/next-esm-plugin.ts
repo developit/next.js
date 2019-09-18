@@ -98,6 +98,17 @@ export default class NextEsmPlugin implements Plugin {
       }
     }
   }
+  
+  getTerserPlugin(config) {
+    const plugins = [].concat(
+      config.plugins || [],
+      config.optimization && config.optimization.minimize && config.optimization.minimizer || []
+    )
+    return plugins.find(plugin =>
+      (plugin.options && plugin.options && plugin.options.terserOptions) ||
+      (plugin.constructor && /Terser/.test(plugin.constructor.name))
+    )
+  }
 
   updateOptions(childCompiler: Compiler) {
     if (!childCompiler.options.module) {
@@ -113,6 +124,20 @@ export default class NextEsmPlugin implements Plugin {
     babelLoader.options = Object.assign({}, babelLoader.options, {
       isModern: true,
     })
+    
+    const terserPlugin = this.getTerserPlugin(childCompiler.options)
+    
+    if (!terserPlugin) {
+      throw new Error('Terser config not found!')
+    }
+    
+    const terserOpts = terserPlugin.options && terserPlugin.options && terserPlugin.options.terserOptions
+    if (terserOpts) {
+      terserOpts.ecma = 8
+      if (terserOpts.parse) terserOpts.parse.ecma = 8
+      if (terserOpts.compress) terserOpts.compress.ecma = 8
+      if (terserOpts.output) terserOpts.output.ecma = 8
+    }
   }
 
   updateAssets(
