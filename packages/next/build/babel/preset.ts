@@ -147,22 +147,23 @@ module.exports = (
       [
         require('@babel/plugin-proposal-object-rest-spread'),
         {
+          loose: true,
           useBuiltIns: true,
         },
       ],
-      [
-        require('@babel/plugin-transform-runtime'),
-        {
-          corejs: 2,
-          helpers: true,
-          regenerator: true,
-          useESModules: supportsESM && presetEnvConfig.modules !== 'commonjs',
-          absoluteRuntime: (process.versions as any).pnp
-            ? __dirname
-            : undefined,
-          ...options['transform-runtime'],
-        },
-      ],
+      // !customModernPreset && [
+      //   require('@babel/plugin-transform-runtime'),
+      //   {
+      //     corejs: 2,
+      //     helpers: true,
+      //     regenerator: true,
+      //     useESModules: supportsESM && presetEnvConfig.modules !== 'commonjs',
+      //     absoluteRuntime: (process.versions as any).pnp
+      //       ? __dirname
+      //       : undefined,
+      //     ...options['transform-runtime'],
+      //   },
+      // ],
       [
         isTest && options['styled-jsx'] && options['styled-jsx']['babel-test']
           ? require('styled-jsx/babel-test')
