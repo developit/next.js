@@ -113,6 +113,7 @@ module.exports = (
           // @babel/plugin-transform-react-jsx-self automatically in development
           development: isDevelopment || isTest,
           pragma: '__jsx',
+          useBuiltIns: isLaxModern,
           ...options['preset-react'],
         },
       ],
@@ -151,19 +152,19 @@ module.exports = (
           useBuiltIns: true,
         },
       ],
-      // !customModernPreset && [
-      //   require('@babel/plugin-transform-runtime'),
-      //   {
-      //     corejs: 2,
-      //     helpers: true,
-      //     regenerator: true,
-      //     useESModules: supportsESM && presetEnvConfig.modules !== 'commonjs',
-      //     absoluteRuntime: (process.versions as any).pnp
-      //       ? __dirname
-      //       : undefined,
-      //     ...options['transform-runtime'],
-      //   },
-      // ],
+      !customModernPreset && [
+        require('@babel/plugin-transform-runtime'),
+        {
+          corejs: 2,
+          helpers: true,
+          regenerator: true,
+          useESModules: supportsESM && presetEnvConfig.modules !== 'commonjs',
+          absoluteRuntime: (process.versions as any).pnp
+            ? __dirname
+            : undefined,
+          ...options['transform-runtime'],
+        },
+      ],
       [
         isTest && options['styled-jsx'] && options['styled-jsx']['babel-test']
           ? require('styled-jsx/babel-test')
